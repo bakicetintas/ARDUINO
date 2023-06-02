@@ -31,8 +31,6 @@ void setup() {
   digitalWrite(in3, HIGH);
   digitalWrite(in4, LOW);
   motorCalistir(); // Motoru başlat
-  
-  ledYakSondur(false); // Başlangıçta LED'i söndür
 }
 
 void loop() {
