@@ -1,0 +1,70 @@
+//DEPREM SENSÖRÜ UYGULAMASI: MOTOR PWM SİNYALİ İLE ÇALIŞIR VE TİTREŞİM SENSÖRÜ ALGILANDIĞINDA BAĞLI OLAN LED 1000ms İÇRİSİNDE YANIP SÖNER.
+//https://www.robotistan.com/yayli-titresim-sensor-karti
+//https://www.robotistan.com/l298n-voltaj-regulatorlu-cift-motor-surucu-karti
+//https://www.robotistan.com/mini-kablolu-titresim-motoru-mini-vibrating-motor-with-cable
+//https://www.robotistan.com/arduino-uno-r3-klon
+
+#include <Wire.h>
+const int enablePin1 = 3;  //MOTOR 1    ENA  = PWM
+const int in1 = 10;
+const int in2 = 11;
+//////////// MOTORLARI VOLTAJ İLE KONTROL ETMEK İSTERSENİZ ENA , ENB PİNLERİNE JUMPER TAKINIZ. ////////////
+
+const int enablePin2 = 4; // MOTOR 2    ENB  = PWM
+const int in3 = 9;
+const int in4 = 8;
+
+const int ledPin = 2;
+const int vibrationSensorPin = 5;
+
+int veri = 0;
+int motorHizi = 0;
+
+void setup() {
+  pinMode(vibrationSensorPin, INPUT_PULLUP);
+  pinMode(ledPin, OUTPUT);
+  pinMode(enablePin1, OUTPUT);
+  pinMode(enablePin2, OUTPUT);
+  motorHiziAyarla(150); // Motor hız ayarı:
+  digitalWrite(in1, HIGH);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, HIGH);
+  digitalWrite(in4, LOW);
+  motorCalistir(); // Motoru başlat
+  
+  ledYakSondur(false); // Başlangıçta LED'i söndür
+}
+
+void loop() {
+  veri = digitalRead(vibrationSensorPin);
+  if (veri == 1) {
+    ledYakSondur(true);  // LED'i yak
+    delay(500);  // 500 ms bekle
+    ledYakSondur(false);  // LED'i söndür
+    delay(500);  // 500 ms bekle
+  } else {
+    ledYakSondur(false);  // LED'i söndür
+  }
+  
+  // Motor hızını seri porttan komutla ayarla
+  if (Serial.available() > 0) {
+    motorHizi = Serial.parseInt(); // Komuttan gelen değeri al
+    motorHiziAyarla(motorHizi); // Motor hızını ayarla
+  }
+}
+
+void ledYakSondur(bool durum) {
+  digitalWrite(ledPin, durum ? HIGH : LOW);
+}
+
+void motorCalistir() {
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
+}
+
+void motorHiziAyarla(int hiz) {
+  analogWrite(enablePin1, hiz);
+  analogWrite(enablePin2, hiz);
+}
